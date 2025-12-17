@@ -17,7 +17,7 @@ async function generateInvoiceBuffer(submission) {
     doc.text(`Payment Date: ${submission.paymentDate}`);
     doc.text(`Agent Name: ${submission.agentName}`);
     doc.text(`PAN: ${submission.pan}`);
-    doc.text(`GST NO: 46AASBD2035G1AC`);
+    doc.text(`GST NO: 46AASBD2035GSD2`);
     doc.end();
   });
 }

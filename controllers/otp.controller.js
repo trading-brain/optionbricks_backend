@@ -25,19 +25,19 @@ exports.sendOtp = async (req, res) => {
     await Otp.create({ email, otp });
 
     const mailOptions = {
-      from: `"Stock Mantra" <${process.env.SMTP_USER}>`,
+      from: `"Optionbricks" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: "Your One-Time Password (OTP) - Stock Mantra",
+      subject: "Your One-Time Password (OTP) - Optionbricks",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 15px; color: #333;">
-          <h3 style="color:#1F3B77;">Stock Mantra Pvt Ltd</h3>
+          <h3 style="color:#1F3B77;">Optionbricks Pvt Ltd</h3>
           <p>Dear User,</p>
           <p>Your One-Time Password (OTP) for verification is:</p>
           <h2 style="color:#1F3B77; letter-spacing: 2px;">${otp}</h2>
           <p>This OTP is valid for <strong>5 minutes</strong>.</p>
           <p>If you didn’t request this, please ignore this email.</p>
           <br/>
-          <p>Warm regards,<br/>Stock Mantra Pvt Ltd</p>
+          <p>Warm regards,<br/>Optionbricks Pvt Ltd</p>
         </div>
       `,
     };

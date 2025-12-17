@@ -63,7 +63,7 @@ async function generateInvoice(req, res) {
     y += 28;
 
     doc.rect(startX, y, pageWidth, 38).stroke();
-    doc.font("Helvetica-Bold").text("Stock Matra Pvt Ltd.", startX + pad, y + 8);
+    doc.font("Helvetica-Bold").text("Optionbricks Pvt Ltd.", startX + pad, y + 8);
     doc.font("Helvetica").text("PUNE , MAHARASHTRA", startX + pad, y + 22);
     y += 38;
 
@@ -191,19 +191,19 @@ async function generateInvoice(req, res) {
     // ===== FOOTER =====
     doc.rect(startX, y, pageWidth, 80).stroke();
     y += 4;
-    doc.font("Helvetica-Bold").text("Stock Matra Pvt Ltd.", startX + pad, y);
+    doc.font("Helvetica-Bold").text("Optionbricks Pvt Ltd.", startX + pad, y);
     y += 14;
-    doc.font("Helvetica").text("SEBI Registration No. INH000015534", startX + pad, y);
+    doc.font("Helvetica").text("SEBI Registration No. INH000017408", startX + pad, y);
     y += 12;
     doc.text(
-      "Email: support@stockmantra.com | Phone: +91-9049800505",
+      "Email: support@optionbricks.in | Phone: +919082280240",
       startX + pad,
       y
     );
     y += 12;
-    doc.text("Website: https://stockmantra.com/", startX + pad, y);
+    doc.text("Website: https://optionbricks.in/", startX + pad, y);
     y += 12;
-    doc.text("Thank you for choosing Stock Mantra!", startX + pad, y);
+    doc.text("Thank you for choosing Optionbricks!", startX + pad, y);
     y += 12;
     doc.text(
       "This invoice is generated electronically and is valid without signature.",

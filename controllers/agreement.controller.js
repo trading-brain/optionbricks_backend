@@ -10,7 +10,7 @@ function agreementEmailTemplate(submission) {
       <h2 style="color: #2c3e50; text-align:center;">Thank you for agreeing to our Terms</h2>
       <p style="font-size: 15px; color: #333;">Hi <strong>${submission.fullName}</strong>,</p>
       <p style="font-size: 15px; color: #333;">
-        We have recorded your acceptance of the <strong>Stock Mantra Pvt Ltd</strong> Terms & Conditions.
+        We have recorded your acceptance of the <strong>Option bricks Pvt Ltd</strong> Terms & Conditions.
       </p>
       <h3 style="color:#2c3e50; border-bottom:1px solid #ddd; padding-bottom:5px;">Subscription Summary</h3>
       <p style="font-size: 14px; margin:6px 0;">Amount: <strong>₹${submission.amount.toFixed(2)}</strong></p>
@@ -25,9 +25,9 @@ function agreementEmailTemplate(submission) {
       </div>
 
       <p style="margin-top: 30px; font-size: 13px; color: #555;">
-        Stock Mantra Pvt Ltd<br>
-        support@stockmantra.com<br>
-        +91-98765-43210
+        Optionbricks Pvt Ltd<br>
+        support@optionbricks.in<br>
+        +919082280240
       </p>
     </div>
   </div>
@@ -54,7 +54,7 @@ async function sendAgreementEmail(req, res) {
     await sendEmail({
       to: submission.email,
       cc: process.env.EMAIL_CC,
-      subject: "Thank you for agreeing to our Terms – Stock Mantra",
+      subject: "Thank you for agreeing to our Terms – optionbricks",
       html: agreementEmailTemplate(submission),
       attachment: agreementBuffer,
       filename: `User_Agreement_${submission.txnId}.pdf`,
