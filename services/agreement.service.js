@@ -77,7 +77,7 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
       doc.fontSize(9).fillColor(lightGray)
         .text("Stock Mantra Pvt Ltd • support@optionbricks • +91-9049800505",
           leftMargin, footerY - 25, { width, align: "center" });
-      doc.text("Website: https://stockmantra.com/", leftMargin, footerY - 12, { width, align: "center" });
+      doc.text("Website: https://optionbricks.in/", leftMargin, footerY - 12, { width, align: "center" });
     }
 
     // ================= PAGE 1 =================

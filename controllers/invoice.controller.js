@@ -18,8 +18,8 @@ async function generateInvoice(req, res) {
     if (!submission)
       return res.status(404).json({ ok: false, message: "Submission not found" });
 
-    const cgst = 90.0;
-    const sgst = 90.0;
+    const cgst = 0.0;
+    const sgst = 0.0;
     const total = submission.amount;
     const baseAmount = (total - (cgst + sgst)).toFixed(2);
     const invoiceNo = `INV-${txnId}-${Date.now()}`;
@@ -43,7 +43,7 @@ async function generateInvoice(req, res) {
 
     // ===== HEADER =====
     doc.rect(startX, y, pageWidth, 28).stroke();
-    doc.font("Helvetica-Bold").fontSize(14).text("TAX INVOICE", 0, y + 8, {
+    doc.font("Helvetica-Bold").fontSize(14).text("ONBOARDING PERFORMA INVOICE", 0, y + 8, {
       align: "center",
     });
     y += 28;
@@ -102,7 +102,7 @@ async function generateInvoice(req, res) {
     // Item row
     doc.rect(startX, y, pageWidth, tableRowHeight).stroke();
     const rowValues = [
-      "2 days Research Services Subscription",
+      "Research Services Subscription",
       "998312",
       "1",
       baseAmount,
@@ -131,16 +131,16 @@ async function generateInvoice(req, res) {
     // ===== TAX SECTION =====
     const taxBoxW = pageWidth * 0.5;
     doc.rect(startX + taxBoxW, y, taxBoxW, 55).stroke();
-    doc.font("Helvetica-Bold").text("CGST", startX + taxBoxW + pad, y + 10);
-    doc.text(cgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 10, {
-      width: 50,
-      align: "right",
-    });
-    doc.font("Helvetica-Bold").text("SGST", startX + taxBoxW + pad, y + 28);
-    doc.text(sgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 28, {
-      width: 50,
-      align: "right",
-    });
+    // doc.font("Helvetica-Bold").text("CGST", startX + taxBoxW + pad, y + 10);
+    // doc.text(cgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 10, {
+    //   width: 50,
+    //   align: "right",
+    // });
+    // doc.font("Helvetica-Bold").text("SGST", startX + taxBoxW + pad, y + 28);
+    // doc.text(sgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 28, {
+    //   width: 50,
+    //   align: "right",
+    // });
 
     // Total box
     doc.rect(startX + taxBoxW, y + 55, taxBoxW, 28).stroke();
