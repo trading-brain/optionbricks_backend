@@ -17,7 +17,7 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     doc.on("data", (chunk) => chunks.push(chunk));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
 
-    const blue = "#1F3B77";
+    const blue = "#43a9a8node preview-agreement.js";
     const gray = "#333";
     const lightGray = "#555";
     const bold = "Helvetica-Bold";
@@ -29,33 +29,162 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     const { fullName, email, mobile } = submission;
 
     // ================= HEADER (only first page) =================
+    // const headerHeight = 100;
+    // doc.rect(0, 0, doc.page.width, headerHeight).fill(blue);
+    // doc.fill("#fff").font(bold).fontSize(14).text("Optionbricks Pvt Ltd", leftMargin, 22);
+    // doc.font(regular).fontSize(10)
+    //   .text("SEBI Registered Research Analyst", leftMargin, 40)
+    //   .text("Registration No. INH000017408", leftMargin, 52)
+    //   .text("Compliance with SEBI (Research Analyst) Regulations, 2014", leftMargin, 64);
+    // doc.moveDown(3);
+
+
     const headerHeight = 100;
-    doc.rect(0, 0, doc.page.width, headerHeight).fill(blue);
-    doc.fill("#fff").font(bold).fontSize(14).text("Optionbricks Pvt Ltd", leftMargin, 22);
-    doc.font(regular).fontSize(10)
-      .text("SEBI Registered Research Analyst", leftMargin, 40)
-      .text("Registration No. INH000017408", leftMargin, 52)
-      .text("Compliance with SEBI (Research Analyst) Regulations, 2014", leftMargin, 64);
-    doc.moveDown(3);
+
+// Background
+doc.rect(0, 0, doc.page.width, headerHeight).fill(blue);
+
+// LEFT — COMPANY NAME (VERTICALLY CENTERED)
+doc
+  .fill("#fff")
+  .font(bold)
+  .fontSize(15)
+  .text("Optionbricks Pvt Ltd.", leftMargin, headerHeight / 2 - 10);
+
+// RIGHT — REGISTRATION BLOCK
+const rightBoxWidth = 300;
+const rightX = doc.page.width - rightBoxWidth - leftMargin;
+const rightStartY = headerHeight / 2 - 26;
+
+doc
+  .font(regular)
+  .fontSize(10)
+  .text("SEBI Registered Research Analyst", rightX, rightStartY, {
+    width: rightBoxWidth,
+    align: "right",
+  })
+  .moveDown(0.3)
+  .text("Registration No. INH000017408", {
+    width: rightBoxWidth,
+    align: "right",
+  })
+  .moveDown(0.3)
+  .text(
+    "Compliance with SEBI (Research Analyst) Regulations, 2014",
+    {
+      width: rightBoxWidth,
+      align: "right",
+    }
+  );
+
+doc.moveDown(3);
+
+
+    // // ================= TITLE =================
+    // doc.fillColor(blue).font(bold).fontSize(18).text("USER AGREEMENT", leftMargin, 110);
+    // doc.font(regular).fontSize(12).fillColor("#000")
+    //   .text("Terms and Conditions of Research Services", leftMargin);
+    // doc.moveTo(leftMargin, doc.y + 4).lineTo(leftMargin + width, doc.y + 4).strokeColor(blue).lineWidth(1).stroke();
+
+    // // ================= CLIENT INFO =================
+    // doc.moveDown(1.5);
+    // doc.fillColor(blue).font(bold).fontSize(13).text("CLIENT INFORMATION:", leftMargin);
+    // const boxTop = doc.y + 5;
+    // doc.rect(leftMargin, boxTop, width, 70).stroke();
+    // doc.font(regular).fillColor(gray).fontSize(normal)
+    //   .text(`Full Name: ${fullName}`, leftMargin + 10, boxTop + 10)
+    //   .text(`Email: ${email}`, leftMargin + 10, boxTop + 28)
+    //   .text(`Mobile: ${mobile}`, leftMargin + 10, boxTop + 46);
+    // doc.moveDown(5);
+    // doc.text(`Agreement Date: ${agreementDate}`, leftMargin);
+    // doc.moveDown(0.8);
+
+
+
+
+
+
 
     // ================= TITLE =================
-    doc.fillColor(blue).font(bold).fontSize(18).text("USER AGREEMENT", leftMargin, 110);
-    doc.font(regular).fontSize(12).fillColor("#000")
-      .text("Terms and Conditions of Research Services", leftMargin);
-    doc.moveTo(leftMargin, doc.y + 4).lineTo(leftMargin + width, doc.y + 4).strokeColor(blue).lineWidth(1).stroke();
+const titleY = 115;
 
-    // ================= CLIENT INFO =================
-    doc.moveDown(1.5);
-    doc.fillColor(blue).font(bold).fontSize(13).text("CLIENT INFORMATION:", leftMargin);
-    const boxTop = doc.y + 5;
-    doc.rect(leftMargin, boxTop, width, 70).stroke();
-    doc.font(regular).fillColor(gray).fontSize(normal)
-      .text(`Full Name: ${fullName}`, leftMargin + 10, boxTop + 10)
-      .text(`Email: ${email}`, leftMargin + 10, boxTop + 28)
-      .text(`Mobile: ${mobile}`, leftMargin + 10, boxTop + 46);
-    doc.moveDown(5);
-    doc.text(`Agreement Date: ${agreementDate}`, leftMargin);
-    doc.moveDown(0.8);
+doc
+  .fillColor(blue)
+  .font(bold)
+  .fontSize(20)
+  .text("USER AGREEMENT", leftMargin, titleY);
+
+doc
+  .font(regular)
+  .fontSize(12)
+  .fillColor(gray)
+  .text("Terms and Conditions of Research Services", leftMargin, doc.y + 4);
+
+// Decorative divider
+doc
+  .moveTo(leftMargin, doc.y + 8)
+  .lineTo(leftMargin + width, doc.y + 8)
+  .strokeColor(blue)
+  .lineWidth(1.5)
+  .stroke();
+
+
+// ================= CLIENT INFO =================
+doc.moveDown(1.8);
+
+// Section heading
+doc
+  .fillColor(blue)
+  .font(bold)
+  .fontSize(14)
+  .text("CLIENT INFORMATION", leftMargin);
+
+// Info card
+const boxTop = doc.y + 10;
+const boxHeight = 85;
+
+// Card border
+doc
+  .roundedRect(leftMargin, boxTop, width, boxHeight, 6)
+  .strokeColor(blue)
+  .lineWidth(1)
+  .stroke();
+
+// Left column
+doc
+  .font(regular)
+  .fontSize(normal)
+  .fillColor(gray)
+  .text(`Full Name`, leftMargin + 14, boxTop + 16)
+  .font(bold)
+  .text(`${fullName}`, leftMargin + 120, boxTop + 16);
+
+// Right column
+doc
+  .font(regular)
+  .fontSize(normal)
+  .fillColor(gray)
+  .text(`Email`, leftMargin + 14, boxTop + 40)
+  .font(bold)
+  .text(`${email}`, leftMargin + 120, boxTop + 40);
+
+doc
+  .font(regular)
+  .fontSize(normal)
+  .fillColor(gray)
+  .text(`Mobile`, leftMargin + 14, boxTop + 64)
+  .font(bold)
+  .text(`${mobile}`, leftMargin + 120, boxTop + 64);
+
+// Agreement date (subtle, below card)
+doc.moveDown(5.2);
+doc
+  .fontSize(10)
+  .fillColor("#555")
+  .text(`Agreement Date: ${agreementDate}`, leftMargin);
+
+doc.moveDown(1);
+
 
     // ================= HELPERS =================
     function heading(title) {
@@ -75,7 +204,7 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     function addFooter() {
       const footerY = 780;
       doc.fontSize(9).fillColor(lightGray)
-        .text("Stock Mantra Pvt Ltd • support@optionbricks • +91-9049800505",
+        .text("Optionbricks Pvt Ltd • support@optionbricks • +91-9049800505",
           leftMargin, footerY - 25, { width, align: "center" });
       doc.text("Website: https://optionbricks.in/", leftMargin, footerY - 12, { width, align: "center" });
     }
@@ -254,26 +383,118 @@ section(
 
     // addFooter();
 
-    // ================= PAGE 5 =================
-    // doc.addPage();
-    heading("CONSENT & ACCEPTANCE:");
-    const consentTop = doc.y + 20;
-    doc.rect(leftMargin, consentTop, width, 200).stroke();
-    doc.font(regular).fillColor(gray)
-      .text(`I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Optionbricks Pvt Ltd as of ${agreementDate}.`,
-        leftMargin + 10, consentTop + 10, { width: width - 20, align: "justify" });
-    doc.moveDown(1.2);
-    doc.font(bold).text("SIGNATURE DETAILS:", leftMargin +10);
-    doc.font(regular).fillColor(gray)
-      .text(`Name: ${fullName}`, leftMargin+10)
-      .text(`Email: ${email}, `,  leftMargin+10)
-      .text(`Signed at: ${agreementDate}`,  leftMargin+10)
-      .text(`IP Address: ${ipAddress || "Not Captured"}`,  leftMargin+10);
+    // // ================= PAGE 5 =================
+    // // doc.addPage();
+    // heading("CONSENT & ACCEPTANCE:");
+    // const consentTop = doc.y + 20;
+    // doc.rect(leftMargin, consentTop, width, 200).stroke();
+    // doc.font(regular).fillColor(gray)
+    //   .text(`I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Optionbricks Pvt Ltd as of ${agreementDate}.`,
+    //     leftMargin + 10, consentTop + 10, { width: width - 20, align: "justify" });
+    // doc.moveDown(1.2);
+    // doc.font(bold).text("SIGNATURE DETAILS:", leftMargin +10);
+    // doc.font(regular).fillColor(gray)
+    //   .text(`Name: ${fullName}`, leftMargin+10)
+    //   .text(`Email: ${email}, `,  leftMargin+10)
+    //   .text(`Signed at: ${agreementDate}`,  leftMargin+10)
+    //   .text(`IP Address: ${ipAddress || "Not Captured"}`,  leftMargin+10);
 
-    doc.moveDown(2);
-    doc.fontSize(9).fillColor(lightGray)
-      .text("Note: This document contains the full Terms & Conditions. Visit https://stockmantra.com for more info.", leftMargin+10, doc.y, { width, align: "justify" });
-       doc.moveDown(4);
+    // doc.moveDown(2);
+    // doc.fontSize(9).fillColor(lightGray)
+    //   .text("Note: This document contains the full Terms & Conditions. Visit https://optionbricks.in for more info.", leftMargin+10, doc.y, { width, align: "justify" });
+    //    doc.moveDown(4);
+
+
+
+
+    // ================= CONSENT & ACCEPTANCE =================
+heading("CONSENT & ACCEPTANCE:");
+
+const consentTop = doc.y + 18;
+const consentHeight = 230;
+
+// Outer card
+doc
+  .roundedRect(leftMargin, consentTop, width, consentHeight, 8)
+  .strokeColor(blue)
+  .lineWidth(1.2)
+  .stroke();
+
+// Accent strip (left)
+doc
+  .rect(leftMargin, consentTop, 6, consentHeight)
+  .fillColor(blue)
+  .fill();
+
+// Consent text
+doc
+  .font(regular)
+  .fontSize(normal)
+  .fillColor(gray)
+  .text(
+    `I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Optionbricks Pvt Ltd as of ${agreementDate}.`,
+    leftMargin + 18,
+    consentTop + 18,
+    {
+      width: width - 36,
+      align: "justify",
+      lineGap: 3,
+    }
+  );
+
+// Divider line
+const dividerY = consentTop + 80;
+doc
+  .moveTo(leftMargin + 18, dividerY)
+  .lineTo(leftMargin + width - 18, dividerY)
+  .strokeColor("#ddd")
+  .lineWidth(1)
+  .stroke();
+
+// Signature title
+doc
+  .font(bold)
+  .fontSize(12)
+  .fillColor(blue)
+  .text("SIGNATURE DETAILS", leftMargin + 18, dividerY + 14);
+
+// Signature info block
+const sigTop = dividerY + 36;
+
+doc
+  .font(regular)
+  .fontSize(normal)
+  .fillColor(gray)
+  .text("Name:", leftMargin + 18, sigTop)
+  .text("Email:", leftMargin + 18, sigTop + 22)
+  .text("Signed at:", leftMargin + 18, sigTop + 44)
+  .text("IP Address:", leftMargin + 18, sigTop + 66);
+
+doc
+  .font(bold)
+  .fillColor(gray)
+  .text(fullName, leftMargin + 120, sigTop)
+  .text(email, leftMargin + 120, sigTop + 22)
+  .text(agreementDate, leftMargin + 120, sigTop + 44)
+  .text(ipAddress || "Not Captured", leftMargin + 120, sigTop + 66);
+
+// Note (subtle)
+doc.moveDown(9);
+doc
+  .fontSize(9)
+  .fillColor(lightGray)
+  .text(
+    "Note: This document contains the full Terms & Conditions. Visit https://optionbricks.in for more info.",
+    leftMargin,
+    consentTop + consentHeight + 10,
+    {
+      width,
+      align: "center",
+    }
+  );
+
+doc.moveDown(3);
+
 
 
      // === FINAL CLOSING SECTION ===
@@ -288,9 +509,9 @@ const footerWidth = width;
 
 // Inside padding text
 doc.font("Helvetica-Bold")
-  .fillColor("#1F3B77")
+  .fillColor("#43a9a8")
   .fontSize(12)
-  .text("Stock Mantra Pvt Ltd.", footerLeft + footerPadding, footerTop + footerPadding);
+  .text("Optionbricks Pvt Ltd.", footerLeft + footerPadding, footerTop + footerPadding);
 
 doc.font("Helvetica")
   .fillColor("#333")
@@ -302,7 +523,7 @@ doc.font("Helvetica")
 
 doc.moveDown(2);
 doc.font("Helvetica-Bold")
-  .fillColor("#1F3B77")
+  .fillColor("#43a9a8")
   .fontSize(11)
   .text("Thank you for choosing Optionbricks", footerLeft + footerPadding, doc.y + 5);
 
