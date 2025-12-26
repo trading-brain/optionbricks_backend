@@ -1,5 +1,6 @@
 // services/agreement.service.js
 const PDFDocument = require("pdfkit");
+const path = require("path");
 
 function formatDate(date) {
   const d = new Date(date);
@@ -31,7 +32,7 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     // ================= HEADER (only first page) =================
     // const headerHeight = 100;
     // doc.rect(0, 0, doc.page.width, headerHeight).fill(blue);
-    // doc.fill("#fff").font(bold).fontSize(14).text("Optionbricks Pvt Ltd", leftMargin, 22);
+    // doc.fill("#fff").font(bold).fontSize(14).text("Optionbricks", leftMargin, 22);
     // doc.font(regular).fontSize(10)
     //   .text("SEBI Registered Research Analyst", leftMargin, 40)
     //   .text("Registration No. INH000017408", leftMargin, 52)
@@ -40,16 +41,31 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
 
 
     const headerHeight = 100;
+     const logoPath = path.join(__dirname, "../assets/logo.png");
+
+
+
+        // Create linear gradient
+const gradient = doc.linearGradient(0, 0, doc.page.width, 0);
+gradient.stop(0, "#2f2f80"); // Purple
+gradient.stop(1, "#2ecc71"); // Blue
 
 // Background
 doc.rect(0, 0, doc.page.width, headerHeight).fill(blue);
+
+
+// LEFT — LOGO
+doc.image(logoPath, leftMargin, 20, {
+  width: 90,
+  align: "left",
+});
 
 // LEFT — COMPANY NAME (VERTICALLY CENTERED)
 doc
   .fill("#fff")
   .font(bold)
   .fontSize(15)
-  .text("Optionbricks Pvt Ltd.", leftMargin, headerHeight / 2 - 10);
+  .text("", leftMargin, headerHeight / 2 - 10);
 
 // RIGHT — REGISTRATION BLOCK
 const rightBoxWidth = 300;
@@ -204,7 +220,7 @@ doc.moveDown(1);
     function addFooter() {
       const footerY = 780;
       doc.fontSize(9).fillColor(lightGray)
-        .text("Optionbricks Pvt Ltd • support@optionbricks • +91-9049800505",
+        .text("Optionbricks • support@optionbricks • +91-9049800505",
           leftMargin, footerY - 25, { width, align: "center" });
       doc.text("Website: https://optionbricks.in/", leftMargin, footerY - 12, { width, align: "center" });
     }
@@ -213,7 +229,7 @@ doc.moveDown(1);
     heading("TERMS AND CONDITIONS:");
     doc.font(regular).fillColor(gray).fontSize(normal).text(
       "Parties to these Terms and Conditions:\n\n" +
-      "i. Research Analyst: Optionbricks Pvt Ltd., a SEBI Registered Research Analyst (INH000017408), with its registered office at Renuka Shobha FI 604 Sno., Chinchwad, Pune, Maharashtra.\n\n" +
+      "i. Research Analyst: Optionbricks., a SEBI Registered Research Analyst (INH000017408), with its registered office at Maharashtra.\n\n" +
       "ii. Client: The individual subscribing to or availing research services provided by the Research Analyst, hereinafter referred to as the 'Client'.",
       leftMargin, doc.y, { width, align: "justify", lineGap: 2 }
     );
@@ -389,7 +405,7 @@ section(
     // const consentTop = doc.y + 20;
     // doc.rect(leftMargin, consentTop, width, 200).stroke();
     // doc.font(regular).fillColor(gray)
-    //   .text(`I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Optionbricks Pvt Ltd as of ${agreementDate}.`,
+    //   .text(`I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Optionbricks as of ${agreementDate}.`,
     //     leftMargin + 10, consentTop + 10, { width: width - 20, align: "justify" });
     // doc.moveDown(1.2);
     // doc.font(bold).text("SIGNATURE DETAILS:", leftMargin +10);
@@ -432,7 +448,7 @@ doc
   .fontSize(normal)
   .fillColor(gray)
   .text(
-    `I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Optionbricks Pvt Ltd as of ${agreementDate}.`,
+    `I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Optionbricks as of ${agreementDate}.`,
     leftMargin + 18,
     consentTop + 18,
     {
@@ -511,7 +527,7 @@ const footerWidth = width;
 doc.font("Helvetica-Bold")
   .fillColor("#43a9a8")
   .fontSize(12)
-  .text("Optionbricks Pvt Ltd.", footerLeft + footerPadding, footerTop + footerPadding);
+  .text("Optionbricks", footerLeft + footerPadding, footerTop + footerPadding);
 
 doc.font("Helvetica")
   .fillColor("#333")

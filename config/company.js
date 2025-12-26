@@ -1,5 +1,5 @@
 const COMPANY = {
-  NAME: "Optionbricks Pvt Ltd.",
+  NAME: "Optionbricks",
   WEBSITE: "https://optionbricks.in/",
 
   SEBI: {
@@ -7,7 +7,7 @@ const COMPANY = {
   },
 
     ADDRESS: {
-    CITY_STATE: "Pune, Maharashtra, India",
+    CITY_STATE: "Maharashtra, India",
   },
 
    GST: {

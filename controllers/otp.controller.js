@@ -30,14 +30,14 @@ exports.sendOtp = async (req, res) => {
       subject: "Your One-Time Password (OTP) - Optionbricks",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 15px; color: #333;">
-          <h3 style="color:#1F3B77;">Optionbricks Pvt Ltd</h3>
+          <h3 style="color:#1F3B77;">Optionbricks</h3>
           <p>Dear User,</p>
           <p>Your One-Time Password (OTP) for verification is:</p>
           <h2 style="color:#1F3B77; letter-spacing: 2px;">${otp}</h2>
           <p>This OTP is valid for <strong>5 minutes</strong>.</p>
           <p>If you didn’t request this, please ignore this email.</p>
           <br/>
-          <p>Warm regards,<br/>Optionbricks Pvt Ltd</p>
+          <p>Warm regards,<br/>Optionbricks</p>
         </div>
       `,
     };

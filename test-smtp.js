@@ -32,7 +32,7 @@ const nodemailer = require("nodemailer");
 
     console.log("\n📨 Sending a test email to yourself...");
     const info = await transporter.sendMail({
-      from: `"Optionbricks Pvt Ltd." <${process.env.SMTP_USER}>`,
+      from: `"Optionbricks" <${process.env.SMTP_USER}>`,
       to: process.env.SMTP_USER, // send to your own address
       cc: process.env.SMTP_CC_EMAIL,
       subject: "✅ Test Email via Hostinger SMTP",

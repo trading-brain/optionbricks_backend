@@ -63,8 +63,8 @@ async function generateInvoice(req, res) {
     y += 28;
 
     doc.rect(startX, y, pageWidth, 38).stroke();
-    doc.font("Helvetica-Bold").text("Optionbricks Pvt Ltd.", startX + pad, y + 8);
-    doc.font("Helvetica").text("PUNE , MAHARASHTRA", startX + pad, y + 22);
+    doc.font("Helvetica-Bold").text("Optionbricks", startX + pad, y + 8);
+    doc.font("Helvetica").text(`  MAHARASHTRA`, startX + pad, y + 22);
     y += 38;
 
     // GST
@@ -191,7 +191,7 @@ async function generateInvoice(req, res) {
     // ===== FOOTER =====
     doc.rect(startX, y, pageWidth, 80).stroke();
     y += 4;
-    doc.font("Helvetica-Bold").text("Optionbricks Pvt Ltd.", startX + pad, y);
+    doc.font("Helvetica-Bold").text("Optionbricks", startX + pad, y);
     y += 14;
     doc.font("Helvetica").text("SEBI Registration No. INH000017408", startX + pad, y);
     y += 12;
