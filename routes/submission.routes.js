@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { uploadFields, submit } = require("../controllers/submission.controller");
+const { uploadFields, submit, getSubmissions, getSubmissionById } = require("../controllers/submission.controller");
 
 
 // Health
