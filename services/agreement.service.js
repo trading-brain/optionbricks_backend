@@ -435,6 +435,40 @@ doc
   .text("Signed at:", leftMargin + 18, sigTop + 44)
   .text("IP Address:", leftMargin + 18, sigTop + 66);
 
+
+
+
+  // ================= SIGNATURE IMAGE (BASE64) =================
+if (submission.signature) {
+  try {
+    const base64Data = submission.signature.replace(
+      /^data:image\/png;base64,/,
+      ""
+    );
+
+    const signatureBuffer = Buffer.from(base64Data, "base64");
+
+    doc.image(signatureBuffer, leftMargin + 120, sigTop + 90, {
+      width: 180,
+      height: 70,
+      align: "left",
+    });
+
+    // Optional label
+    doc
+      .fontSize(9)
+      .fillColor("#555")
+      .text("Client Signature", leftMargin + 120, sigTop + 165);
+  } catch (err) {
+    console.error("❌ Failed to render signature:", err);
+  }
+}
+
+
+
+
+
+
 doc
   .font(bold)
   .fillColor(gray)
