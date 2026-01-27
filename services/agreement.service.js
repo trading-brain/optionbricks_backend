@@ -448,9 +448,9 @@ if (submission.signature) {
 
     const signatureBuffer = Buffer.from(base64Data, "base64");
 
-    doc.image(signatureBuffer, leftMargin + 120, sigTop + 90, {
+    doc.image(signatureBuffer, leftMargin + 120, sigTop + 70, {
       width: 180,
-      height: 70,
+      height: 60,
       align: "left",
     });
 
