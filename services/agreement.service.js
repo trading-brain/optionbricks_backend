@@ -96,29 +96,6 @@ doc
 doc.moveDown(3);
 
 
-    // // ================= TITLE =================
-    // doc.fillColor(blue).font(bold).fontSize(18).text("USER AGREEMENT", leftMargin, 110);
-    // doc.font(regular).fontSize(12).fillColor("#000")
-    //   .text("Terms and Conditions of Research Services", leftMargin);
-    // doc.moveTo(leftMargin, doc.y + 4).lineTo(leftMargin + width, doc.y + 4).strokeColor(blue).lineWidth(1).stroke();
-
-    // // ================= CLIENT INFO =================
-    // doc.moveDown(1.5);
-    // doc.fillColor(blue).font(bold).fontSize(13).text("CLIENT INFORMATION:", leftMargin);
-    // const boxTop = doc.y + 5;
-    // doc.rect(leftMargin, boxTop, width, 70).stroke();
-    // doc.font(regular).fillColor(gray).fontSize(normal)
-    //   .text(`Full Name: ${fullName}`, leftMargin + 10, boxTop + 10)
-    //   .text(`Email: ${email}`, leftMargin + 10, boxTop + 28)
-    //   .text(`Mobile: ${mobile}`, leftMargin + 10, boxTop + 46);
-    // doc.moveDown(5);
-    // doc.text(`Agreement Date: ${agreementDate}`, leftMargin);
-    // doc.moveDown(0.8);
-
-
-
-
-
 
 
     // ================= TITLE =================
@@ -245,9 +222,6 @@ doc.moveDown(1);
     );
 
     addFooter();
-
-    // ================= PAGE 2 =================
-    // doc.addPage();
 
  // PAGE 2
 // doc.addPage();
@@ -394,31 +368,6 @@ section(
   "The client agrees to abide with the terms and conditions of the research services."
 );
 
-// addFooter();
-
-
-    // addFooter();
-
-    // // ================= PAGE 5 =================
-    // // doc.addPage();
-    // heading("CONSENT & ACCEPTANCE:");
-    // const consentTop = doc.y + 20;
-    // doc.rect(leftMargin, consentTop, width, 200).stroke();
-    // doc.font(regular).fillColor(gray)
-    //   .text(`I, ${fullName}, acknowledge that I have read and agree to the complete Terms & Conditions set forth by Optionbricks as of ${agreementDate}.`,
-    //     leftMargin + 10, consentTop + 10, { width: width - 20, align: "justify" });
-    // doc.moveDown(1.2);
-    // doc.font(bold).text("SIGNATURE DETAILS:", leftMargin +10);
-    // doc.font(regular).fillColor(gray)
-    //   .text(`Name: ${fullName}`, leftMargin+10)
-    //   .text(`Email: ${email}, `,  leftMargin+10)
-    //   .text(`Signed at: ${agreementDate}`,  leftMargin+10)
-    //   .text(`IP Address: ${ipAddress || "Not Captured"}`,  leftMargin+10);
-
-    // doc.moveDown(2);
-    // doc.fontSize(9).fillColor(lightGray)
-    //   .text("Note: This document contains the full Terms & Conditions. Visit https://optionbricks.in for more info.", leftMargin+10, doc.y, { width, align: "justify" });
-    //    doc.moveDown(4);
 
 
 

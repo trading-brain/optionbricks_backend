@@ -27,6 +27,16 @@ const submissionSchema = new mongoose.Schema(
     panDoc: { type: cloudinaryFileSchema, required: true },
     aadharDoc: { type: cloudinaryFileSchema, required: true },
 
+
+
+      // ✅ AGREEMENT + ESIGN (ADD THIS)
+      agreementAccepted: { type: Boolean, default: false },
+      agreementAcceptedAt: { type: Date },
+      agreementIp: { type: String },
+    signature: { type: String },
+
+    //end e sign
+
     createdAt: { type: Date, default: Date.now },
   },
   { collection: "submissions" }

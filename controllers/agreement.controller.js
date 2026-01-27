@@ -36,11 +36,15 @@ function agreementEmailTemplate(submission) {
 
 async function sendAgreementEmail(req, res) {
   try {
-    const { email} = req.body;
+    const { email, signatureBase64 } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ ok: false, message: "Email is required." });
+    if (!email || !signatureBase64) {
+      return res.status(400).json({
+        ok: false,
+        message: "Email and e-signature are required",
+      });
     }
+
 
 
 function getClientIp(req) {
@@ -70,6 +74,37 @@ console.log("Client IP:", clientIp);
       return res.status(404).json({ ok: false, message: "No submission found for this email." });
     }
 
+
+
+
+     // esign start
+
+
+    if (submission.agreementAccepted) {
+      return res.status(409).json({
+        ok: false,
+        message: "Agreement already accepted",
+      });
+    }
+
+
+
+    submission.signature = signatureBase64;
+    submission.agreementAccepted = true;
+    submission.agreementAcceptedAt = new Date();
+    submission.agreementIp = getClientIp(req);
+
+    await submission.save();
+
+
+
+    // esign end
+
+
+
+
+
+
     // Generate agreement PDF
     const agreementBuffer = await generateUserAgreementBuffer(submission, clientIp);
 
@@ -96,4 +131,72 @@ console.log("Client IP:", clientIp);
   }
 }
 
-module.exports = { sendAgreementEmail };
+
+
+
+
+
+// Reuse IP helper
+function getClientIp(req) {
+  let ip =
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.headers["x-real-ip"] ||
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    req.ip;
+
+  if (ip === "::1") ip = "127.0.0.1";
+  if (ip?.startsWith("::ffff:")) ip = ip.replace("::ffff:", "");
+
+  return ip;
+}
+
+async function getAgreementPdfByEmail(req, res) {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({
+        ok: false,
+        message: "Email is required",
+      });
+    }
+
+    const submission = await Submission.findOne({ email });
+
+    if (!submission) {
+      return res.status(404).json({
+        ok: false,
+        message: "No agreement found for this email",
+      });
+    }
+
+    const clientIp = getClientIp(req);
+
+    // Generate PDF
+    const pdfBuffer = await generateUserAgreementBuffer(
+      submission,
+      clientIp
+    );
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename=User_Agreement_${submission.txnId || "Optionbricks"}.pdf`
+    );
+
+    return res.send(pdfBuffer);
+  } catch (error) {
+    console.error("❌ Get agreement PDF error:", error);
+    return res.status(500).json({
+      ok: false,
+      message: "Failed to generate agreement PDF",
+    });
+  }
+}
+
+
+
+
+
+module.exports = { sendAgreementEmail, getAgreementPdfByEmail };
