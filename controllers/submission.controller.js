@@ -18,10 +18,23 @@ const upload = multer({
   },
 });
 
+
+
+
 const uploadFields = upload.fields([
   { name: "panDoc", maxCount: 1 },
   { name: "aadharDoc", maxCount: 1 },
 ]);
+
+
+
+
+function sanitizeFileName(name) {
+  return name
+    .trim()                 // remove starting/ending spaces
+    .replace(/\s+/g, "_")   // replace spaces with _
+    .replace(/[^\w.-]/g, ""); // remove special characters
+}
 
 async function submit(req, res) {
   try {
@@ -36,21 +49,40 @@ async function submit(req, res) {
     if (errors.length) return res.status(400).json({ ok: false, errors });
 
     // Upload to Cloudinary
-    const panDocMeta = await uploadToCloudinary(
-      panFile.buffer,
-      `${Date.now()}-${req.body.pan}-PAN-${panFile.originalname}`
-    );
-    const aadharDocMeta = await uploadToCloudinary(
-      aadharFile.buffer,
-      `${Date.now()}-${req.body.pan}-AADHAR-${aadharFile.originalname}`
-    );
+    // const panDocMeta = await uploadToCloudinary(
+    //   panFile.buffer,
+    //   `${Date.now()}-${req.body.pan}-PAN-${panFile.originalname}`
+    // );
+    // const aadharDocMeta = await uploadToCloudinary(
+    //   aadharFile.buffer,
+    //   `${Date.now()}-${req.body.pan}-AADHAR-${aadharFile.originalname}`
+    // );
+
+
+
+
+    // sanitize inputs
+const safePan = req.body.pan.trim().toUpperCase();
+const panFileName = sanitizeFileName(panFile.originalname);
+const aadharFileName = sanitizeFileName(aadharFile.originalname);
+
+// Upload to Cloudinary
+const panDocMeta = await uploadToCloudinary(
+  panFile.buffer,
+  `${Date.now()}-${safePan}-PAN-${panFileName}`
+);
+
+const aadharDocMeta = await uploadToCloudinary(
+  aadharFile.buffer,
+  `${Date.now()}-${safePan}-AADHAR-${aadharFileName}`
+);
 
     // Save submission
     const submission = await Submission.create({
       fullName: req.body.fullName,
       email: req.body.email,
       mobile: req.body.mobile,
-      pan: req.body.pan.toUpperCase(),
+   pan: req.body.pan.toUpperCase(),
       dob: req.body.dob,
       amount: parseFloat(req.body.amount),
       paymentDate: req.body.paymentDate,
