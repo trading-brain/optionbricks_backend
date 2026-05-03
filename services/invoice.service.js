@@ -13,9 +13,14 @@ function formatDate(date) {
 
 async function generateInvoiceBuffer(submission) {
   return new Promise((resolve) => {
-    const cgst = 90.0;
-    const sgst = 90.0;
+    // const cgst = 90.0;
+    // const sgst = 90.0;
     const total = submission.amount;
+
+    const cgst = (total * 0.09);
+    const sgst = (total * 0.09);
+
+
     const baseAmount = (total - (cgst + sgst)).toFixed(2);
     const invoiceNo = `INV-${submission.txnId}-${Date.now()}`;
     const invoiceDate = formatDate(new Date());
@@ -166,6 +171,27 @@ doc
   .stroke();
 
 y += 14;
+
+
+
+
+
+
+
+
+
+    // ===== TAX SECTION =====
+    const taxBoxW = pageWidth * 0.5;
+    doc.rect(startX + taxBoxW, y, taxBoxW, 55).stroke();
+    doc.font("Helvetica-Bold").text("CGST", startX + taxBoxW + pad, y + 10);
+    doc.text(cgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 10, { width: 50, align: "right" });
+    doc.font("Helvetica-Bold").text("SGST", startX + taxBoxW + pad, y + 28);
+    doc.text(sgst.toFixed(2), startX + taxBoxW + taxBoxW - 70, y + 28, { width: 50, align: "right" });
+     y += 60;
+
+
+
+
 
 
     /* ================= TOTAL ================= */
