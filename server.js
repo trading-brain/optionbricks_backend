@@ -8,9 +8,11 @@ const submissionRoutes = require("./routes/submission.routes");
 const invoiceRoutes = require("./routes/invoice.routes");
 const agreementRoutes = require("./routes/agreement.routes");
 const otpRoutes = require("./routes/otp.routes");
+const { startSubmissionWorker } = require("./workers/submission.worker");
 
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI;
+const RUN_WORKER_INLINE = process.env.RUN_WORKER_INLINE !== "false";
 
 const app = express();
 
@@ -43,4 +45,12 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ ok: false, message: "Unexpected server error." });
 });
 
-app.listen(PORT, () => console.log(`🚀 API listening on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 API listening on http://localhost:${PORT}`);
+  if (RUN_WORKER_INLINE) {
+    startSubmissionWorker();
+    console.log("👷 Submission worker started (inline)");
+  } else {
+    console.log("ℹ️  Inline worker disabled — run `npm run worker` separately");
+  }
+});

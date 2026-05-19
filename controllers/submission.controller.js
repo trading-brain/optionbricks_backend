@@ -6,6 +6,8 @@ const { validateBody } = require("../utils/validate");
 const { sendEmail } = require("../services/email.service");
 const { welcomeEmailTemplate } = require("../templates/welcomeEmail");
 const { generateInvoiceBuffer } = require("../services/invoice.service");
+const { generateUserAgreementBuffer } = require("../services/agreement.service");
+const { enqueueSubmissionPostprocess } = require("../queues/submission.queue");
 
 const allowedMime = new Set(["application/pdf", "image/png", "image/jpeg"]);
 
@@ -138,6 +140,101 @@ const aadharDocMeta = await uploadToCloudinary(
 
 
 
+
+
+async function submitWithAgreement(req, res) {
+  try {
+    const files = req.files || {};
+    const panFile = files.panDoc?.[0];
+    const aadharFile = files.aadharDoc?.[0];
+
+    const {
+      fullName,
+      email,
+      mobile,
+      signatureBase64,
+      location,
+      lat,
+      lng,
+    } = req.body;
+
+    const errors = [];
+    if (!fullName) errors.push({ field: "fullName", message: "Name is required" });
+    if (!email) errors.push({ field: "email", message: "Email is required" });
+    if (!mobile) errors.push({ field: "mobile", message: "Mobile is required" });
+    if (errors.length) return res.status(400).json({ ok: false, errors });
+
+    // Parallel Cloudinary uploads — halves wait time vs serial awaits
+    const [panDocMeta, aadharDocMeta] = await Promise.all([
+      panFile
+        ? uploadToCloudinary(
+            panFile.buffer,
+            `${Date.now()}-${fullName}-PAN-${panFile.originalname}`
+          )
+        : Promise.resolve(null),
+      aadharFile
+        ? uploadToCloudinary(
+            aadharFile.buffer,
+            `${Date.now()}-${fullName}-AADHAR-${aadharFile.originalname}`
+          )
+        : Promise.resolve(null),
+    ]);
+
+    let clientIp = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip;
+    if (clientIp === "::1") clientIp = "127.0.0.1";
+    if (clientIp?.startsWith("::ffff:")) clientIp = clientIp.replace("::ffff:", "");
+
+    const formattedLocation = location
+      ? `${location} | Lat: ${lat ?? "NA"}, Lng: ${lng ?? "NA"}`
+      : `IP: ${clientIp}`;
+
+    const submission = await Submission.create({
+      fullName,
+      email,
+      mobile,
+      pan: req.body.pan,
+      dob: req.body.dob,
+      amount: req.body.amount ? parseFloat(req.body.amount) : undefined,
+      paymentDate: req.body.paymentDate,
+      txnId: req.body.txnId,
+      agentName: req.body.agentName,
+      panDoc: panDocMeta,
+      aadharDoc: aadharDocMeta,
+      signature: signatureBase64,
+      agreementAccepted: !!signatureBase64,
+      agreementAcceptedAt: signatureBase64 ? new Date() : null,
+      agreementIp: clientIp,
+      location: formattedLocation,
+    });
+
+    // Hand off heavy work (PDF generation + emails) to BullMQ worker.
+    // The submission row is the source of truth — even if enqueue fails,
+    // the data is captured and the job can be replayed by an admin tool.
+    try {
+      await enqueueSubmissionPostprocess(submission._id);
+    } catch (enqueueErr) {
+      console.error(
+        `⚠️  Enqueue failed for ${submission._id} — submission saved, will need manual replay:`,
+        enqueueErr.message
+      );
+    }
+
+    return res.status(201).json({
+      ok: true,
+      message: "Submission received. Email will arrive shortly.",
+      data: submission,
+    });
+  } catch (err) {
+    console.error("❌ Combined error:", err);
+    return res.status(500).json({ ok: false, message: "Server error" });
+  }
+}
+
+
+
+
+
+
 // GET all submissions (Admin Panel)
 async function getSubmissions(req, res) {
   try {
@@ -147,6 +244,8 @@ async function getSubmissions(req, res) {
       search = "",
       fromDate,
       toDate,
+      includeDeleted,
+      onlyDeleted,
     } = req.query;
 
     const skip = (page - 1) * limit;
@@ -172,7 +271,13 @@ async function getSubmissions(req, res) {
       if (toDate) dateQuery.paymentDate.$lte = new Date(toDate);
     }
 
+    // 🗑️ Soft-delete filter
+    let deleteFilter = { isDeleted: { $ne: true } };
+    if (onlyDeleted === "true") deleteFilter = { isDeleted: true };
+    else if (includeDeleted === "true") deleteFilter = {};
+
     const query = {
+      ...deleteFilter,
       ...searchQuery,
       ...dateQuery,
     };
@@ -209,8 +314,12 @@ async function getSubmissions(req, res) {
 async function getSubmissionById(req, res) {
   try {
     const { id } = req.params;
+    const { includeDeleted } = req.query;
 
-    const submission = await Submission.findById(id);
+    const query = { _id: id };
+    if (includeDeleted !== "true") query.isDeleted = { $ne: true };
+
+    const submission = await Submission.findOne(query);
     if (!submission) {
       return res.status(404).json({
         ok: false,
@@ -231,4 +340,76 @@ async function getSubmissionById(req, res) {
   }
 }
 
-module.exports = { uploadFields, submit, getSubmissions, getSubmissionById };
+// SOFT DELETE submission
+async function softDeleteSubmission(req, res) {
+  try {
+    const { id } = req.params;
+
+    const submission = await Submission.findOneAndUpdate(
+      { _id: id, isDeleted: { $ne: true } },
+      { $set: { isDeleted: true, deletedAt: new Date() } },
+      { new: true }
+    );
+
+    if (!submission) {
+      return res.status(404).json({
+        ok: false,
+        message: "Submission not found or already deleted",
+      });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      message: "Submission soft-deleted",
+      data: submission,
+    });
+  } catch (err) {
+    console.error("❌ Soft delete error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "Failed to soft delete submission",
+    });
+  }
+}
+
+// RESTORE soft-deleted submission
+async function restoreSubmission(req, res) {
+  try {
+    const { id } = req.params;
+
+    const submission = await Submission.findOneAndUpdate(
+      { _id: id, isDeleted: true },
+      { $set: { isDeleted: false, deletedAt: null } },
+      { new: true }
+    );
+
+    if (!submission) {
+      return res.status(404).json({
+        ok: false,
+        message: "Deleted submission not found",
+      });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      message: "Submission restored",
+      data: submission,
+    });
+  } catch (err) {
+    console.error("❌ Restore error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "Failed to restore submission",
+    });
+  }
+}
+
+module.exports = {
+  uploadFields,
+  submit,
+  getSubmissions,
+  getSubmissionById,
+  submitWithAgreement,
+  softDeleteSubmission,
+  restoreSubmission,
+};

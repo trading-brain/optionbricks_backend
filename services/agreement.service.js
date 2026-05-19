@@ -376,7 +376,7 @@ section(
 heading("CONSENT & ACCEPTANCE:");
 
 const consentTop = doc.y + 18;
-const consentHeight = 230;
+const consentHeight = 320;
 
 // Outer card
 doc
@@ -438,31 +438,7 @@ doc
 
 
 
-  // ================= SIGNATURE IMAGE (BASE64) =================
-if (submission.signature) {
-  try {
-    const base64Data = submission.signature.replace(
-      /^data:image\/png;base64,/,
-      ""
-    );
-
-    const signatureBuffer = Buffer.from(base64Data, "base64");
-
-    doc.image(signatureBuffer, leftMargin + 110, sigTop + 60, {
-      width: 180,
-      height: 60,
-      align: "left",
-    });
-
-    // Optional label
-    doc
-      .fontSize(9)
-      .fillColor("#555")
-      .text("Client Signature", leftMargin + 120, sigTop + 165);
-  } catch (err) {
-    console.error("❌ Failed to render signature:", err);
-  }
-}
+  // (Signature block moved below — see after IP Address values)
 
 
 
@@ -477,8 +453,58 @@ doc
   .text(agreementDate, leftMargin + 120, sigTop + 44)
   .text(ipAddress || "Not Captured", leftMargin + 120, sigTop + 66);
 
+// ================= SIGNATURE (below IP Address) =================
+const signatureTop = sigTop + 95;
+doc
+  .font(regular)
+  .fontSize(normal)
+  .fillColor(gray)
+  .text("Signature:", leftMargin + 18, signatureTop);
+
+let afterSignatureY = signatureTop + 22;
+if (submission.signature) {
+  try {
+    const base64Data = submission.signature.replace(
+      /^data:image\/png;base64,/,
+      ""
+    );
+    const signatureBuffer = Buffer.from(base64Data, "base64");
+    doc.image(signatureBuffer, leftMargin + 120, signatureTop - 5, {
+      width: 180,
+      height: 60,
+      align: "left",
+    });
+    afterSignatureY = signatureTop + 65;
+  } catch (err) {
+    console.error("❌ Failed to render signature:", err);
+    doc
+      .font(bold)
+      .fillColor(gray)
+      .text("Not Captured", leftMargin + 120, signatureTop);
+  }
+} else {
+  doc
+    .font(bold)
+    .fillColor(gray)
+    .text("Not Captured", leftMargin + 120, signatureTop);
+}
+
+// ================= ADDRESS (below Signature) =================
+const addressTop = afterSignatureY + 12;
+doc
+  .font(regular)
+  .fontSize(normal)
+  .fillColor(gray)
+  .text("Address:", leftMargin + 18, addressTop);
+doc
+  .font(bold)
+  .fillColor(gray)
+  .text(submission.location || "Not Captured", leftMargin + 120, addressTop, {
+    width: width - 138,
+  });
+
 // Note (subtle)
-doc.moveDown(9);
+doc.moveDown(100);
 doc
   .fontSize(9)
   .fillColor(lightGray)
