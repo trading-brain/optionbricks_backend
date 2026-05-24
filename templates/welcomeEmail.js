@@ -48,7 +48,28 @@ function welcomeEmailTemplate({
         <a href="${COMPANY.WEBSITE}" style="color:#1A2C80;">our website</a>.</p>
       </div>
 
-      <div style="margin-top:25px;">
+      
+
+      <p style="margin-top:25px;">Warm regards,</p>
+      <p><strong>${COMPANY.NAME}</strong><br>
+      SEBI Registered Research Analyst<br>
+      Reg No. ${COMPANY.SEBI.REG_NO}<br>
+      <a href="mailto:${COMPANY.CONTACT.SUPPORT_EMAIL}" style="color:#1A2C80;">
+        ${COMPANY.CONTACT.SUPPORT_EMAIL}
+      </a> | ${COMPANY.CONTACT.REPORT_MOBILE}
+      </p>
+    </div>
+  </div>`;
+}
+
+module.exports = { welcomeEmailTemplate };
+
+
+
+
+
+
+{/* <div style="margin-top:25px;">
         <h3>Your Subscription Details</h3>
         <table style="width:100%; border-collapse:collapse; margin-top:10px;">
           <tr><td>Amount Paid:</td><td><strong>₹${amount.toFixed(2)}</strong></td></tr>
@@ -65,20 +86,6 @@ function welcomeEmailTemplate({
            style="background-color:#1A2C80; color:white; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block; margin-top:10px;">
            Review & Accept Terms & Conditions
         </a>
-      </div>
-
-      <p style="margin-top:25px;">Warm regards,</p>
-      <p><strong>${COMPANY.NAME}</strong><br>
-      SEBI Registered Research Analyst<br>
-      Reg No. ${COMPANY.SEBI.REG_NO}<br>
-      <a href="mailto:${COMPANY.CONTACT.SUPPORT_EMAIL}" style="color:#1A2C80;">
-        ${COMPANY.CONTACT.SUPPORT_EMAIL}
-      </a> | ${COMPANY.CONTACT.REPORT_MOBILE}
-      </p>
-    </div>
-  </div>`;
-}
-
-module.exports = { welcomeEmailTemplate };
+      </div> */}
 
 
