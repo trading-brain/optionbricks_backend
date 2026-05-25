@@ -28,11 +28,11 @@ function welcomeEmailTemplate({
     <div style="padding:30px;">
       <p>Dear <strong>${name}</strong>,</p>
 
-      <p>Warm welcome by <strong>${COMPANY.NAME}</strong> – a SEBI Registered Research Analyst 
+      <p>Warm welcome to <strong>${COMPANY.NAME}</strong> – a SEBI Registered Research Analyst 
       (Registration No. <strong>${COMPANY.SEBI.REG_NO}</strong>) offering independent equity research services in compliance 
       with SEBI (Research Analyst) Regulations, 2014.</p>
 
-      <p>We are delighted to have you on board! For more details, visit 
+      <p>We’re delighted to have you on board! You’re receiving this email as part of your subscription to our research services. For more details about our offerings, you can always explore
       <a href="${COMPANY.WEBSITE}" style="color:#1A2C80;">${COMPANY.WEBSITE}</a>.</p>
 
       <p>If you have questions, reach us at 
