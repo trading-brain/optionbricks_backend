@@ -541,7 +541,7 @@ doc.font("Helvetica-Bold")
 doc.font("Helvetica")
   .fillColor("#333")
   .fontSize(10)
-  .text("SEBI Registration No. +919082280240", footerLeft + footerPadding, doc.y + 3)
+  .text("SEBI Registration No. INH000017408", footerLeft + footerPadding, doc.y + 3)
   .text("Email: support@optionbricks.in", footerLeft + footerPadding, doc.y + 3)
   .text("Phone: +91-9049800505", footerLeft + footerPadding, doc.y + 3)
   .text("Website: https://optionbricks.in/", footerLeft + footerPadding, doc.y + 3);
