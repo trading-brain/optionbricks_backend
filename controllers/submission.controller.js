@@ -383,6 +383,7 @@ async function updateSubmission(req, res) {
       "paymentDate",
       "txnId",
       "agentName",
+      "location",
     ];
 
     const update = {};
@@ -393,7 +394,14 @@ async function updateSubmission(req, res) {
     // Accept the PAN number under either name used across the apps.
     if (req.body.panCard !== undefined) update.pan = req.body.panCard;
     if (update.pan) update.pan = String(update.pan).toUpperCase();
-    if (update.amount !== undefined) update.amount = parseFloat(update.amount);
+
+    // Amount is a Number in the schema. An empty string would cast to NaN and
+    // throw, so coerce it: blank → null (clear it), otherwise a valid number.
+    if (update.amount !== undefined) {
+      const parsed = parseFloat(update.amount);
+      update.amount =
+        update.amount === "" || Number.isNaN(parsed) ? null : parsed;
+    }
 
     // Optionally replace the PAN / Aadhaar documents. They can arrive either
     // as a multipart file upload or as a base64 data URL from the panel.
