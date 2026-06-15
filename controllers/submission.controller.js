@@ -38,6 +38,15 @@ function sanitizeFileName(name) {
     .replace(/[^\w.-]/g, ""); // remove special characters
 }
 
+// Decode a base64 data URL (e.g. "data:image/png;base64,....") into a Buffer.
+// Returns null for empty / malformed input so callers can skip the upload.
+function dataUrlToBuffer(dataUrl) {
+  if (!dataUrl || typeof dataUrl !== "string") return null;
+  const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+  if (!match) return null;
+  return { mime: match[1], buffer: Buffer.from(match[2], "base64") };
+}
+
 async function submit(req, res) {
   try {
     const files = req.files || {};
@@ -156,7 +165,15 @@ async function submitWithAgreement(req, res) {
       location,
       lat,
       lng,
+      // The frontend (NewKyc) sends the PAN number as `panCard` and the PAN
+      // document as a base64 data URL in `panCardImageBase64`. Accept the
+      // legacy `pan` / multipart names too so older clients keep working.
+      panCard,
+      panCardImageBase64,
+      aadharImageBase64,
     } = req.body;
+
+    const pan = panCard || req.body.pan;
 
     const errors = [];
     if (!fullName) errors.push({ field: "fullName", message: "Name is required" });
@@ -164,18 +181,28 @@ async function submitWithAgreement(req, res) {
     if (!mobile) errors.push({ field: "mobile", message: "Mobile is required" });
     if (errors.length) return res.status(400).json({ ok: false, errors });
 
+    const safeName = sanitizeFileName(fullName || "user");
+
+    // Resolve the PAN/Aadhaar documents from whichever transport the client
+    // used: a multipart file upload (legacy) or a base64 data URL (NewKyc).
+    const panBase64 = dataUrlToBuffer(panCardImageBase64);
+    const aadharBase64 = dataUrlToBuffer(aadharImageBase64);
+
+    const panBuffer = panFile?.buffer || panBase64?.buffer || null;
+    const aadharBuffer = aadharFile?.buffer || aadharBase64?.buffer || null;
+
     // Parallel Cloudinary uploads — halves wait time vs serial awaits
     const [panDocMeta, aadharDocMeta] = await Promise.all([
-      panFile
+      panBuffer
         ? uploadToCloudinary(
-            panFile.buffer,
-            `${Date.now()}-${fullName}-PAN-${panFile.originalname}`
+            panBuffer,
+            `${Date.now()}-${safeName}-PAN-${sanitizeFileName(panFile?.originalname || "pan")}`
           )
         : Promise.resolve(null),
-      aadharFile
+      aadharBuffer
         ? uploadToCloudinary(
-            aadharFile.buffer,
-            `${Date.now()}-${fullName}-AADHAR-${aadharFile.originalname}`
+            aadharBuffer,
+            `${Date.now()}-${safeName}-AADHAR-${sanitizeFileName(aadharFile?.originalname || "aadhar")}`
           )
         : Promise.resolve(null),
     ]);
@@ -192,7 +219,7 @@ async function submitWithAgreement(req, res) {
       fullName,
       email,
       mobile,
-      pan: req.body.pan,
+      pan: pan ? pan.toUpperCase() : undefined,
       dob: req.body.dob,
       amount: req.body.amount ? parseFloat(req.body.amount) : undefined,
       paymentDate: req.body.paymentDate,
@@ -340,6 +367,86 @@ async function getSubmissionById(req, res) {
   }
 }
 
+// UPDATE submission (Admin Panel edit)
+async function updateSubmission(req, res) {
+  try {
+    const { id } = req.params;
+
+    // Whitelist the plain text fields an admin is allowed to edit.
+    const editable = [
+      "fullName",
+      "email",
+      "mobile",
+      "pan",
+      "dob",
+      "amount",
+      "paymentDate",
+      "txnId",
+      "agentName",
+    ];
+
+    const update = {};
+    for (const field of editable) {
+      if (req.body[field] !== undefined) update[field] = req.body[field];
+    }
+
+    // Accept the PAN number under either name used across the apps.
+    if (req.body.panCard !== undefined) update.pan = req.body.panCard;
+    if (update.pan) update.pan = String(update.pan).toUpperCase();
+    if (update.amount !== undefined) update.amount = parseFloat(update.amount);
+
+    // Optionally replace the PAN / Aadhaar documents. They can arrive either
+    // as a multipart file upload or as a base64 data URL from the panel.
+    const files = req.files || {};
+    const panFile = files.panDoc?.[0];
+    const aadharFile = files.aadharDoc?.[0];
+    const panBase64 = dataUrlToBuffer(req.body.panCardImageBase64);
+    const aadharBase64 = dataUrlToBuffer(req.body.aadharImageBase64);
+
+    const safeName = sanitizeFileName(update.fullName || "user");
+    const panBuffer = panFile?.buffer || panBase64?.buffer || null;
+    const aadharBuffer = aadharFile?.buffer || aadharBase64?.buffer || null;
+
+    if (panBuffer) {
+      update.panDoc = await uploadToCloudinary(
+        panBuffer,
+        `${Date.now()}-${safeName}-PAN-${sanitizeFileName(panFile?.originalname || "pan")}`
+      );
+    }
+    if (aadharBuffer) {
+      update.aadharDoc = await uploadToCloudinary(
+        aadharBuffer,
+        `${Date.now()}-${safeName}-AADHAR-${sanitizeFileName(aadharFile?.originalname || "aadhar")}`
+      );
+    }
+
+    const submission = await Submission.findOneAndUpdate(
+      { _id: id, isDeleted: { $ne: true } },
+      { $set: update },
+      { new: true, runValidators: true }
+    );
+
+    if (!submission) {
+      return res.status(404).json({
+        ok: false,
+        message: "Submission not found",
+      });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      message: "Submission updated",
+      data: submission,
+    });
+  } catch (err) {
+    console.error("❌ Update submission error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "Failed to update submission",
+    });
+  }
+}
+
 // SOFT DELETE submission
 async function softDeleteSubmission(req, res) {
   try {
@@ -410,6 +517,7 @@ module.exports = {
   getSubmissions,
   getSubmissionById,
   submitWithAgreement,
+  updateSubmission,
   softDeleteSubmission,
   restoreSubmission,
 };

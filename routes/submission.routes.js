@@ -5,6 +5,7 @@ const {
   getSubmissions,
   getSubmissionById,
   submitWithAgreement,
+  updateSubmission,
   softDeleteSubmission,
   restoreSubmission,
 } = require("../controllers/submission.controller");
@@ -29,6 +30,9 @@ router.get("/userkyc/", getSubmissions);
 
 // GET – single submission
 router.get("/userkyc/:id", getSubmissionById);
+
+// ✏️ Update submission (admin edit) — accepts JSON base64 or multipart files
+router.put("/userkyc/:id", uploadFields, updateSubmission);
 
 // 🗑️ Soft delete submission
 router.delete("/userkyc/:id", softDeleteSubmission);
