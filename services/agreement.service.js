@@ -26,7 +26,14 @@ async function generateUserAgreementBuffer(submission, ipAddress) {
     const normal = 11;
     const leftMargin = 60;
     const width = 480;
-    const agreementDate = formatDate(new Date());
+    // Use the date the agreement was actually signed, not the moment this PDF
+    // happens to be generated. Otherwise an admin re-opening the PDF from the
+    // panel later would see today's date instead of the real signing date.
+    // For a fresh sign-up the signing date IS "now", so the user's emailed copy
+    // stays identical — only stale regenerations get corrected.
+    const agreementDate = formatDate(
+      submission.agreementAcceptedAt || submission.createdAt || new Date()
+    );
     const { fullName, email, mobile } = submission;
 
     // ================= HEADER (only first page) =================
