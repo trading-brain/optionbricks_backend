@@ -8,6 +8,7 @@ const submissionRoutes = require("./routes/submission.routes");
 const invoiceRoutes = require("./routes/invoice.routes");
 const agreementRoutes = require("./routes/agreement.routes");
 const otpRoutes = require("./routes/otp.routes");
+const complaintBoardRoutes = require("./routes/complaintBoard.routes");
 const { startSubmissionWorker } = require("./workers/submission.worker");
 
 const PORT = process.env.PORT || 4000;
@@ -34,6 +35,7 @@ app.use("/api", submissionRoutes);
 app.use("/api", invoiceRoutes); 
 app.use("/api", agreementRoutes);
 app.use("/api/otp", otpRoutes);
+app.use("/api", complaintBoardRoutes);
 
 app.use((err, _req, res, _next) => {
   if (err?.name === "MulterError") {
